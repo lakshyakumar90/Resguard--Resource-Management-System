@@ -1,0 +1,36 @@
+{
+  "system": {
+    "state_dir": "states",
+    "state_save_interval": 60,
+    "max_history_size": 1000
+  },
+  "resources": {
+    "cpu": 100,
+    "memory": 1000,
+    "disk": 1000,
+    "network": 100
+  },
+  "desktop_app": {
+    "title": "ResGuard Resource Manager",
+    "width": 800,
+    "height": 600,
+    "refresh_interval": 1.0
+  },
+  "web_dashboard": {
+    "host": "127.0.0.1",
+    "port": 5000,
+    "debug": false,
+    "refresh_interval": 1.0
+  },
+  "security": {
+    "enable_authentication": true,
+    "default_username": "admin",
+    "default_password": "admin"
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "resguard.log",
+    "max_size": 10485760,
+    "backup_count": 5
+  }
+}

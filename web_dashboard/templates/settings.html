@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResGuard Settings</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+        .header {
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e5e5e5;
+            margin-bottom: 30px;
+        }
+        .footer {
+            padding-top: 20px;
+            border-top: 1px solid #e5e5e5;
+            margin-top: 30px;
+            text-align: center;
+            color: #777;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .form-group small {
+            color: #6c757d;
+        }
+        .section-header {
+            background-color: #f8f9fa;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="row">
+                <div class="col-md-8">
+                    <h1>ResGuard Settings</h1>
+                    <p class="lead">Configure the Resource Management System</p>
+                </div>
+                <div class="col-md-4 text-right">
+                    <a href="/" class="btn btn-outline-primary">Dashboard</a>
+                    <a href="/logout" class="btn btn-outline-secondary ml-2">Logout</a>
+                </div>
+            </div>
+        </div>
+
+        {% if errors %}
+        <div class="alert alert-danger">
+            <h4 class="alert-heading">Validation Errors</h4>
+            <ul>
+                {% for error in errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div class="alert alert-success">
+            Settings saved successfully!
+        </div>
+        {% endif %}
+
+        <form method="post">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="list-group" id="settings-tabs" role="tablist">
+                        <a class="list-group-item list-group-item-action active" id="system-tab" data-toggle="list" href="#system" role="tab">System</a>
+                        <a class="list-group-item list-group-item-action" id="resources-tab" data-toggle="list" href="#resources" role="tab">Resources</a>
+                        <a class="list-group-item list-group-item-action" id="desktop-tab" data-toggle="list" href="#desktop" role="tab">Desktop App</a>
+                        <a class="list-group-item list-group-item-action" id="web-tab" data-toggle="list" href="#web" role="tab">Web Dashboard</a>
+                        <a class="list-group-item list-group-item-action" id="security-tab" data-toggle="list" href="#security" role="tab">Security</a>
+                        <a class="list-group-item list-group-item-action" id="logging-tab" data-toggle="list" href="#logging" role="tab">Logging</a>
+                    </div>
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary btn-block">Save Settings</button>
+                        <a href="/settings?reset=all" class="btn btn-warning btn-block mt-2">Reset All</a>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <div class="tab-content">
+                        <!-- System Settings -->
+                        <div class="tab-pane fade show active" id="system" role="tabpanel">
+                            <div class="section-header">
+                                <h3>System Settings</h3>
+                                <p>Configure core system behavior</p>
+                                <a href="/settings?reset=system" class="btn btn-sm btn-outline-warning">Reset Section</a>
+                            </div>
+                            
+                            {% for field in metadata.system %}
+                            <div class="form-group">
+                                <label for="{{ field.name }}">{{ field.label }}</label>
+                                {% if field.type == 'string' %}
+                                <input type="text" class="form-control" id="{{ field.name }}" name="system.{{ field.name }}" value="{{ config.system[field.name] }}">
+                                {% elif field.type == 'number' %}
+                                <input type="number" class="form-control" id="{{ field.name }}" name="system.{{ field.name }}" value="{{ config.system[field.name] }}" 
+                                       {% if field.min is defined %}min="{{ field.min }}"{% endif %} 
+                                       {% if field.max is defined %}max="{{ field.max }}"{% endif %} 
+                                       {% if field.step is defined %}step="{{ field.step }}"{% endif %}>
+                                {% elif field.type == 'boolean' %}
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="{{ field.name }}" name="system.{{ field.name }}" {% if config.system[field.name] %}checked{% endif %}>
+                                    <label class="form-check-label" for="{{ field.name }}">Enabled</label>
+                                </div>
+                                {% elif field.type == 'select' %}
+                                <select class="form-control" id="{{ field.name }}" name="system.{{ field.name }}">
+                                    {% for option in field.options %}
+                                    <option value="{{ option }}" {% if config.system[field.name] == option %}selected{% endif %}>{{ option }}</option>
+                                    {% endfor %}
+                                </select>
+                                {% endif %}
+                                <small class="form-text text-muted">{{ field.description }}</small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Resources Settings -->
+                        <div class="tab-pane fade" id="resources" role="tabpanel">
+                            <div class="section-header">
+                                <h3>Resource Settings</h3>
+                                <p>Configure available system resources</p>
+                                <a href="/settings?reset=resources" class="btn btn-sm btn-outline-warning">Reset Section</a>
+                            </div>
+                            
+                            {% for field in metadata.resources %}
+                            <div class="form-group">
+                                <label for="{{ field.name }}">{{ field.label }}</label>
+                                {% if field.type == 'string' %}
+                                <input type="text" class="form-control" id="{{ field.name }}" name="resources.{{ field.name }}" value="{{ config.resources[field.name] }}">
+                                {% elif field.type == 'number' %}
+                                <input type="number" class="form-control" id="{{ field.name }}" name="resources.{{ field.name }}" value="{{ config.resources[field.name] }}" 
+                                       {% if field.min is defined %}min="{{ field.min }}"{% endif %} 
+                                       {% if field.max is defined %}max="{{ field.max }}"{% endif %} 
+                                       {% if field.step is defined %}step="{{ field.step }}"{% endif %}>
+                                {% elif field.type == 'boolean' %}
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="{{ field.name }}" name="resources.{{ field.name }}" {% if config.resources[field.name] %}checked{% endif %}>
+                                    <label class="form-check-label" for="{{ field.name }}">Enabled</label>
+                                </div>
+                                {% elif field.type == 'select' %}
+                                <select class="form-control" id="{{ field.name }}" name="resources.{{ field.name }}">
+                                    {% for option in field.options %}
+                                    <option value="{{ option }}" {% if config.resources[field.name] == option %}selected{% endif %}>{{ option }}</option>
+                                    {% endfor %}
+                                </select>
+                                {% endif %}
+                                <small class="form-text text-muted">{{ field.description }}</small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Desktop App Settings -->
+                        <div class="tab-pane fade" id="desktop" role="tabpanel">
+                            <div class="section-header">
+                                <h3>Desktop Application Settings</h3>
+                                <p>Configure the desktop application</p>
+                                <a href="/settings?reset=desktop_app" class="btn btn-sm btn-outline-warning">Reset Section</a>
+                            </div>
+                            
+                            {% for field in metadata.desktop_app %}
+                            <div class="form-group">
+                                <label for="{{ field.name }}">{{ field.label }}</label>
+                                {% if field.type == 'string' %}
+                                <input type="text" class="form-control" id="{{ field.name }}" name="desktop_app.{{ field.name }}" value="{{ config.desktop_app[field.name] }}">
+                                {% elif field.type == 'number' %}
+                                <input type="number" class="form-control" id="{{ field.name }}" name="desktop_app.{{ field.name }}" value="{{ config.desktop_app[field.name] }}" 
+                                       {% if field.min is defined %}min="{{ field.min }}"{% endif %} 
+                                       {% if field.max is defined %}max="{{ field.max }}"{% endif %} 
+                                       {% if field.step is defined %}step="{{ field.step }}"{% endif %}>
+                                {% elif field.type == 'boolean' %}
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="{{ field.name }}" name="desktop_app.{{ field.name }}" {% if config.desktop_app[field.name] %}checked{% endif %}>
+                                    <label class="form-check-label" for="{{ field.name }}">Enabled</label>
+                                </div>
+                                {% elif field.type == 'select' %}
+                                <select class="form-control" id="{{ field.name }}" name="desktop_app.{{ field.name }}">
+                                    {% for option in field.options %}
+                                    <option value="{{ option }}" {% if config.desktop_app[field.name] == option %}selected{% endif %}>{{ option }}</option>
+                                    {% endfor %}
+                                </select>
+                                {% endif %}
+                                <small class="form-text text-muted">{{ field.description }}</small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Web Dashboard Settings -->
+                        <div class="tab-pane fade" id="web" role="tabpanel">
+                            <div class="section-header">
+                                <h3>Web Dashboard Settings</h3>
+                                <p>Configure the web dashboard</p>
+                                <a href="/settings?reset=web_dashboard" class="btn btn-sm btn-outline-warning">Reset Section</a>
+                            </div>
+                            
+                            {% for field in metadata.web_dashboard %}
+                            <div class="form-group">
+                                <label for="{{ field.name }}">{{ field.label }}</label>
+                                {% if field.type == 'string' %}
+                                <input type="text" class="form-control" id="{{ field.name }}" name="web_dashboard.{{ field.name }}" value="{{ config.web_dashboard[field.name] }}">
+                                {% elif field.type == 'number' %}
+                                <input type="number" class="form-control" id="{{ field.name }}" name="web_dashboard.{{ field.name }}" value="{{ config.web_dashboard[field.name] }}" 
+                                       {% if field.min is defined %}min="{{ field.min }}"{% endif %} 
+                                       {% if field.max is defined %}max="{{ field.max }}"{% endif %} 
+                                       {% if field.step is defined %}step="{{ field.step }}"{% endif %}>
+                                {% elif field.type == 'boolean' %}
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="{{ field.name }}" name="web_dashboard.{{ field.name }}" {% if config.web_dashboard[field.name] %}checked{% endif %}>
+                                    <label class="form-check-label" for="{{ field.name }}">Enabled</label>
+                                </div>
+                                {% elif field.type == 'select' %}
+                                <select class="form-control" id="{{ field.name }}" name="web_dashboard.{{ field.name }}">
+                                    {% for option in field.options %}
+                                    <option value="{{ option }}" {% if config.web_dashboard[field.name] == option %}selected{% endif %}>{{ option }}</option>
+                                    {% endfor %}
+                                </select>
+                                {% endif %}
+                                <small class="form-text text-muted">{{ field.description }}</small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Security Settings -->
+                        <div class="tab-pane fade" id="security" role="tabpanel">
+                            <div class="section-header">
+                                <h3>Security Settings</h3>
+                                <p>Configure authentication and security</p>
+                                <a href="/settings?reset=security" class="btn btn-sm btn-outline-warning">Reset Section</a>
+                            </div>
+                            
+                            {% for field in metadata.security %}
+                            <div class="form-group">
+                                <label for="{{ field.name }}">{{ field.label }}</label>
+                                {% if field.type == 'string' %}
+                                <input type="text" class="form-control" id="{{ field.name }}" name="security.{{ field.name }}" value="{{ config.security[field.name] }}">
+                                {% elif field.type == 'password' %}
+                                <input type="password" class="form-control" id="{{ field.name }}" name="security.{{ field.name }}" value="{{ config.security[field.name] }}">
+                                {% elif field.type == 'number' %}
+                                <input type="number" class="form-control" id="{{ field.name }}" name="security.{{ field.name }}" value="{{ config.security[field.name] }}" 
+                                       {% if field.min is defined %}min="{{ field.min }}"{% endif %} 
+                                       {% if field.max is defined %}max="{{ field.max }}"{% endif %} 
+                                       {% if field.step is defined %}step="{{ field.step }}"{% endif %}>
+                                {% elif field.type == 'boolean' %}
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="{{ field.name }}" name="security.{{ field.name }}" {% if config.security[field.name] %}checked{% endif %}>
+                                    <label class="form-check-label" for="{{ field.name }}">Enabled</label>
+                                </div>
+                                {% elif field.type == 'select' %}
+                                <select class="form-control" id="{{ field.name }}" name="security.{{ field.name }}">
+                                    {% for option in field.options %}
+                                    <option value="{{ option }}" {% if config.security[field.name] == option %}selected{% endif %}>{{ option }}</option>
+                                    {% endfor %}
+                                </select>
+                                {% endif %}
+                                <small class="form-text text-muted">{{ field.description }}</small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Logging Settings -->
+                        <div class="tab-pane fade" id="logging" role="tabpanel">
+                            <div class="section-header">
+                                <h3>Logging Settings</h3>
+                                <p>Configure system logging</p>
+                                <a href="/settings?reset=logging" class="btn btn-sm btn-outline-warning">Reset Section</a>
+                            </div>
+                            
+                            {% for field in metadata.logging %}
+                            <div class="form-group">
+                                <label for="{{ field.name }}">{{ field.label }}</label>
+                                {% if field.type == 'string' %}
+                                <input type="text" class="form-control" id="{{ field.name }}" name="logging.{{ field.name }}" value="{{ config.logging[field.name] }}">
+                                {% elif field.type == 'number' %}
+                                <input type="number" class="form-control" id="{{ field.name }}" name="logging.{{ field.name }}" value="{{ config.logging[field.name] }}" 
+                                       {% if field.min is defined %}min="{{ field.min }}"{% endif %} 
+                                       {% if field.max is defined %}max="{{ field.max }}"{% endif %} 
+                                       {% if field.step is defined %}step="{{ field.step }}"{% endif %}>
+                                {% elif field.type == 'boolean' %}
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="{{ field.name }}" name="logging.{{ field.name }}" {% if config.logging[field.name] %}checked{% endif %}>
+                                    <label class="form-check-label" for="{{ field.name }}">Enabled</label>
+                                </div>
+                                {% elif field.type == 'select' %}
+                                <select class="form-control" id="{{ field.name }}" name="logging.{{ field.name }}">
+                                    {% for option in field.options %}
+                                    <option value="{{ option }}" {% if config.logging[field.name] == option %}selected{% endif %}>{{ option }}</option>
+                                    {% endfor %}
+                                </select>
+                                {% endif %}
+                                <small class="form-text text-muted">{{ field.description }}</small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="footer">
+            <p>ResGuard: Dynamic Resource Management System &copy; 2024</p>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
