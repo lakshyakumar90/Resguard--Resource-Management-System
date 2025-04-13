@@ -44,12 +44,8 @@ A software project to dynamically allocate computing resources (e.g., memory, CP
 
 ```bash
 # Clone the repository
-git clone https://github.com/lakshyakumar90/resguard.git
+git clone : https://github.com/lakshyakumar90/Resguard--Resource-Management-System.git
 cd resguard
-
-# Create and activate a virtual environment (optional but recommended)
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
