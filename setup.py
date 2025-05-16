@@ -9,12 +9,12 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 setup(
     name="resguard",
     version="1.0.0",
-    author="Your Name",
-    author_email="your.email@example.com",
+    author="Lakshya kumar",
+    author_email="lakshyakumar5023@gmail.com",
     description="Dynamic Resource Management System using Banker's Algorithm",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/resguard",
+    url="https://github.com/lakshyakumar90/Resguard--Resource-Management-System",
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

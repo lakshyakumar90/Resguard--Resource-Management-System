@@ -32,5 +32,38 @@
     "file": "resguard.log",
     "max_size": 10485760,
     "backup_count": 5
+  },
+  "reports": {
+    "enabled": true,
+    "generation_interval": 86400,
+    "retention_period": 30,
+    "include_metrics": [
+      "cpu",
+      "memory",
+      "disk",
+      "network"
+    ],
+    "format": "html",
+    "output_dir": "reports"
+  },
+  "auto_scaling": {
+    "enabled": true,
+    "mode": "reactive",
+    "check_interval": 300,
+    "cooldown_period": 600,
+    "scale_up_threshold": 80,
+    "scale_down_threshold": 30,
+    "scale_up_amount": 10,
+    "scale_down_amount": 5
+  },
+  "alerting": {
+    "enabled": true,
+    "thresholds": {
+      "cpu": {"warning": 70, "critical": 90},
+      "memory": {"warning": 70, "critical": 90},
+      "disk": {"warning": 70, "critical": 90},
+      "network": {"warning": 70, "critical": 90}
+    },
+    "cooldown_period": 300
   }
 }

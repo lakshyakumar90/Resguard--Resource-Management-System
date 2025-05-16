@@ -13,6 +13,9 @@ from typing import Dict, Any
 from core.resource_manager import ResourceManager
 from core.thread_manager import ThreadManager
 from core.state_manager import StateManager
+from core.report_generator import ReportGenerator
+from core.auto_scaler import AutoScaler
+from core.alerting_system import AlertingSystem
 from utils.system_monitor import SystemMonitor
 from utils.config import Config
 from desktop_app.app import DesktopApp
@@ -153,12 +156,36 @@ def main():
         print("Loading previous state...")
         resource_manager.load_state()
 
+    # Create report generator
+    print("Initializing report generator...")
+    report_generator = ReportGenerator(resource_manager, system_monitor, config)
+
+    # Start report generator if enabled
+    if config.get("reports", "enabled"):
+        report_generator.start()
+
+    # Create alerting system
+    print("Initializing alerting system...")
+    alerting_system = AlertingSystem(resource_manager, system_monitor, config)
+
+    # Start alerting system if enabled
+    if config.get("alerting", "enabled"):
+        alerting_system.start()
+
+    # Create auto-scaler
+    print("Initializing auto-scaler...")
+    auto_scaler = AutoScaler(resource_manager, system_monitor, None, config)
+
+    # Start auto-scaler if enabled
+    if config.get("auto_scaling", "enabled"):
+        auto_scaler.start()
+
     # Start web dashboard in a separate thread if not desktop-only
     if not args.desktop_only:
         print("Starting web dashboard...")
         web_thread = threading.Thread(
             target=start_web_dashboard,
-            args=(resource_manager, system_monitor, config),
+            args=(system_monitor, config),
             daemon=True
         )
         web_thread.start()
@@ -166,7 +193,15 @@ def main():
     # Start desktop application if not web-only
     if not args.web_only:
         print("Starting desktop application...")
-        start_desktop_app(resource_manager, thread_manager, system_monitor, config)
+        start_desktop_app(
+            resource_manager,
+            thread_manager,
+            system_monitor,
+            config,
+            report_generator=report_generator,
+            auto_scaler=auto_scaler,
+            alerting_system=alerting_system
+        )
     else:
         # If web-only, keep the main thread alive
         try:
@@ -174,17 +209,30 @@ def main():
                 time.sleep(1)
         except KeyboardInterrupt:
             print("Shutting down...")
+            # Stop report generator if enabled
+            if config.get("reports", "enabled"):
+                report_generator.stop()
+
+            # Stop alerting system if enabled
+            if config.get("alerting", "enabled"):
+                alerting_system.stop()
+
+            # Stop auto-scaler if enabled
+            if config.get("auto_scaling", "enabled"):
+                auto_scaler.stop()
+
+            # Shutdown core components
             resource_manager.shutdown()
             system_monitor.shutdown()
 
 
-def start_web_dashboard(resource_manager, system_monitor, config):
+def start_web_dashboard(system_monitor, config):
     """Start the web dashboard."""
     # Create Flask app
-    flask_app = create_app(resource_manager, system_monitor, config)
+    flask_app = create_app(system_monitor, config)
 
     # Create Dash app
-    dash_app = create_dashboard(flask_app, resource_manager, system_monitor, config)
+    dash_app = create_dashboard(flask_app, system_monitor, config)
 
     # Run Flask app
     host = config.get("web_dashboard", "host")
@@ -195,9 +243,18 @@ def start_web_dashboard(resource_manager, system_monitor, config):
     run_app(flask_app, host=host, port=port, debug=debug, threaded=True)
 
 
-def start_desktop_app(resource_manager, thread_manager, system_monitor, config):
+def start_desktop_app(resource_manager, thread_manager, system_monitor, config,
+                  report_generator=None, auto_scaler=None, alerting_system=None):
     """Start the desktop application."""
-    app = DesktopApp(resource_manager, thread_manager, system_monitor, config)
+    app = DesktopApp(
+        resource_manager,
+        thread_manager,
+        system_monitor,
+        config,
+        report_generator=report_generator,
+        auto_scaler=auto_scaler,
+        alerting_system=alerting_system
+    )
     app.run()
 
 

@@ -75,7 +75,38 @@ class Config:
                 "file": "resguard.log",
                 "max_size": 10485760,  # 10 MB
                 "backup_count": 5
-            }
+            },
+
+            "auto_scaling": {
+                "enabled": True,
+                "mode": "reactive", 
+                "check_interval": 300,  # seconds
+                "cooldown_period": 600,  # seconds
+                "scale_up_threshold": 80,  # percentage
+                "scale_down_threshold": 20,  # percentage
+                "max_scale_step": 20,  # percentage
+                "scheduled_plans": []  # List of scheduled scaling plans
+            },
+
+            "alerting": {
+                "enabled": True,
+                "thresholds": {
+                    "cpu": {"warning": 70, "critical": 90},
+                    "memory": {"warning": 70, "critical": 90},
+                    "disk": {"warning": 70, "critical": 90},
+                    "network": {"warning": 70, "critical": 90}
+                },
+                "cooldown_period": 300  # seconds
+            },
+            "reports": {
+                "enabled": True,
+                "generation_interval": 86400,  # seconds (daily)
+                "retention_period": 30,  # days
+                "include_metrics": ["cpu", "memory", "disk", "network"],
+                "format": "html",  # html, pdf, json
+                "output_dir": "reports"
+            },
+
         }
 
         # Return a deep copy of the default configuration
@@ -309,5 +340,25 @@ class Config:
                 {"name": "file", "type": "string", "label": "Log File", "description": "Path to the log file"},
                 {"name": "max_size", "type": "number", "label": "Max Log Size", "description": "Maximum size of log file in bytes", "min": 1024},
                 {"name": "backup_count", "type": "number", "label": "Backup Count", "description": "Number of backup log files to keep", "min": 0}
+            ],
+            "auto_scaling": [
+                {"name": "enabled", "type": "boolean", "label": "Enable Auto-Scaling", "description": "Enable automatic resource scaling"},
+                {"name": "check_interval", "type": "number", "label": "Check Interval", "description": "Time between scaling checks in seconds", "min": 1},
+                {"name": "cooldown_period", "type": "number", "label": "Cooldown Period", "description": "Time to wait between scaling actions in seconds", "min": 1},
+                {"name": "scale_up_threshold", "type": "number", "label": "Scale Up Threshold", "description": "Usage percentage to trigger scale up", "min": 1, "max": 100},
+                {"name": "scale_down_threshold", "type": "number", "label": "Scale Down Threshold", "description": "Usage percentage to trigger scale down", "min": 0, "max": 99},
+                {"name": "scale_up_amount", "type": "number", "label": "Scale Up Amount", "description": "Amount to increase resources by", "min": 1},
+                {"name": "scale_down_amount", "type": "number", "label": "Scale Down Amount", "description": "Amount to decrease resources by", "min": 1}
+            ],
+            "alerting": [
+                {"name": "enabled", "type": "boolean", "label": "Enable Alerting", "description": "Enable resource usage alerts"},
+                {"name": "cooldown_period", "type": "number", "label": "Cooldown Period", "description": "Time between alerts in seconds", "min": 1}
+            ],
+            "reports": [
+                {"name": "enabled", "type": "boolean", "label": "Enable Reports", "description": "Enable report generation"},
+                {"name": "generation_interval", "type": "number", "label": "Generation Interval", "description": "Time between report generation in seconds", "min": 1},
+                {"name": "retention_period", "type": "number", "label": "Retention Period", "description": "Number of days to keep reports", "min": 1},
+                {"name": "format", "type": "select", "label": "Report Format", "description": "Format of generated reports", "options": ["html", "pdf", "json"]},
+                {"name": "output_dir", "type": "string", "label": "Output Directory", "description": "Directory to store generated reports"}
             ]
         }

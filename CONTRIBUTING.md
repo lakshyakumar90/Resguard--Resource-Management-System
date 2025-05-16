@@ -10,7 +10,7 @@ By participating in this project, you agree to abide by our Code of Conduct. Ple
 
 ### Reporting Bugs
 
-- Check if the bug has already been reported in the [Issues](https://github.com/yourusername/resguard/issues)
+- Check if the bug has already been reported in the [Issues](https://github.com/lakshyakumar90/Resguard--Resource-Management-System/issues)
 - Use the bug report template to create a new issue
 - Include detailed steps to reproduce the bug
 - Include screenshots if applicable
@@ -18,7 +18,7 @@ By participating in this project, you agree to abide by our Code of Conduct. Ple
 
 ### Suggesting Features
 
-- Check if the feature has already been suggested in the [Issues](https://github.com/yourusername/resguard/issues)
+- Check if the feature has already been suggested in the [Issues](https://github.com/lakshyakumar90/Resguard--Resource-Management-System/issues)
 - Use the feature request template to create a new issue
 - Provide a clear description of the feature and its benefits
 - Include examples of how the feature would be used
@@ -37,7 +37,7 @@ By participating in this project, you agree to abide by our Code of Conduct. Ple
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/resguard.git
+   git clone https://github.com/lakshyakumar90/Resguard--Resource-Management-System.git
    cd resguard
    ```
 
@@ -55,11 +55,6 @@ By participating in this project, you agree to abide by our Code of Conduct. Ple
 4. Create a configuration file:
    ```bash
    cp config.json.example config.json
-   ```
-
-5. Run the tests:
-   ```bash
-   python -m unittest discover tests
    ```
 
 ## Coding Guidelines
@@ -90,15 +85,6 @@ By participating in this project, you agree to abide by our Code of Conduct. Ple
    ```
 
 4. Create a pull request from your branch to the main repository
-
-## Testing
-
-- Write unit tests for all new functionality
-- Ensure all tests pass before submitting a pull request
-- Run tests using:
-  ```bash
-  python -m unittest discover tests
-  ```
 
 ## Documentation
 

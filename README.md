@@ -22,7 +22,9 @@ A software project to dynamically allocate computing resources (e.g., memory, CP
 - **Core Manager**: Implements Banker's Algorithm for safe resource allocation
 - **Desktop App**: Tkinter-based UI for resource management
 - **Web Dashboard**: Flask/Dash/Plotly for real-time visualization
-- **Analyzer**: Predicts usage patterns and optimizes allocations
+- **Auto Scaler**: Automatically adjusts resources based on usage
+- **Report Generator**: Creates usage reports for analysis
+- **Alerting System**: Monitors resource usage and generates alerts when thresholds are exceeded
 
 ## Key Features
 
@@ -31,7 +33,10 @@ A software project to dynamically allocate computing resources (e.g., memory, CP
 - **Resource Reset**: Automatically resets allocations to 0 on startup for a clean slate
 - **State Persistence**: Saves and loads system state between runs
 - **Interactive Dashboards**: Real-time charts and visualizations of resource usage
-- **Configurable**: Extensive configuration options via settings UI and command-line arguments
+- **Auto Scaling**: Automatically adjusts resource allocations based on current usage
+- **Report Generation**: Creates detailed reports of resource usage
+- **Alerting System**: Generates alerts when resource usage exceeds configurable thresholds
+- **Configurable**: Basic configuration options via settings UI and command-line arguments
 
 ## Installation
 
@@ -104,6 +109,9 @@ ResGuard can be configured through the `config.json` file or via the settings UI
 - **Web Dashboard**: Host, port, debug mode, and refresh interval
 - **Security**: Authentication settings
 - **Logging**: Log level, file, size, and backup count
+- **Auto Scaling**: Thresholds, scaling amounts, check intervals, and cooldown periods
+- **Reports**: Generation interval, retention period, and output format
+- **Alerting**: Warning and critical thresholds, cooldown periods
 
 ## Architecture
 
@@ -115,7 +123,10 @@ resguard/
 │   ├── banker_algorithm.py     # Banker's Algorithm implementation
 │   ├── resource_manager.py     # Central resource management
 │   ├── thread_manager.py       # Concurrent task handling
-│   └── state_manager.py        # State persistence
+│   ├── state_manager.py        # State persistence
+│   ├── auto_scaler.py          # Automatic resource scaling
+│   ├── report_generator.py     # Report generation
+│   └── alerting_system.py      # Alerting system
 ├── desktop_app/        # Desktop UI
 │   ├── app.py                  # Main application
 │   ├── dashboard.py            # Resource monitoring UI
@@ -126,7 +137,6 @@ resguard/
 │   └── templates/              # HTML templates
 ├── utils/              # Utilities
 │   ├── system_monitor.py       # System monitoring
-│   ├── analyzer.py             # Usage prediction
 │   └── config.py               # Configuration management
 └── tests/              # Unit tests
 ```
@@ -159,8 +169,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Lakshya Kumar
 - Chitrance Dogra
-- Anshuman Riar
 - Aman Rana
+- Anshuman Riar
 
 ## Acknowledgments
 
