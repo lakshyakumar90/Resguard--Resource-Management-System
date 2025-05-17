@@ -13,7 +13,6 @@ from typing import Dict, Any
 from core.resource_manager import ResourceManager
 from core.thread_manager import ThreadManager
 from core.state_manager import StateManager
-from core.report_generator import ReportGenerator
 from core.auto_scaler import AutoScaler
 from core.alerting_system import AlertingSystem
 from utils.system_monitor import SystemMonitor
@@ -156,13 +155,7 @@ def main():
         print("Loading previous state...")
         resource_manager.load_state()
 
-    # Create report generator
-    print("Initializing report generator...")
-    report_generator = ReportGenerator(resource_manager, system_monitor, config)
 
-    # Start report generator if enabled
-    if config.get("reports", "enabled"):
-        report_generator.start()
 
     # Create alerting system
     print("Initializing alerting system...")
@@ -198,7 +191,6 @@ def main():
             thread_manager,
             system_monitor,
             config,
-            report_generator=report_generator,
             auto_scaler=auto_scaler,
             alerting_system=alerting_system
         )
@@ -209,9 +201,7 @@ def main():
                 time.sleep(1)
         except KeyboardInterrupt:
             print("Shutting down...")
-            # Stop report generator if enabled
-            if config.get("reports", "enabled"):
-                report_generator.stop()
+
 
             # Stop alerting system if enabled
             if config.get("alerting", "enabled"):
@@ -244,14 +234,13 @@ def start_web_dashboard(system_monitor, config):
 
 
 def start_desktop_app(resource_manager, thread_manager, system_monitor, config,
-                  report_generator=None, auto_scaler=None, alerting_system=None):
+                  auto_scaler=None, alerting_system=None):
     """Start the desktop application."""
     app = DesktopApp(
         resource_manager,
         thread_manager,
         system_monitor,
         config,
-        report_generator=report_generator,
         auto_scaler=auto_scaler,
         alerting_system=alerting_system
     )

@@ -14,5 +14,3 @@ flask>=2.0.0
 dash>=2.0.0
 plotly>=5.0.0
 
-# Testing
-pytest>=6.0.0

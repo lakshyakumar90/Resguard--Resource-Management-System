@@ -14,13 +14,12 @@ from typing import Dict, Any
 
 from core.resource_manager import ResourceManager
 from core.thread_manager import ThreadManager
-from core.report_generator import ReportGenerator
 from core.auto_scaler import AutoScaler
 from core.alerting_system import AlertingSystem
 from utils.system_monitor import SystemMonitor
 from utils.config import Config
 from desktop_app.login import LoginScreen
-from desktop_app.dashboard import Dashboard 
+from desktop_app.dashboard import Dashboard
 from desktop_app.settings_dialog import SettingsDialog
 
 
@@ -36,8 +35,7 @@ class DesktopApp:
 
     def __init__(self, resource_manager: ResourceManager, thread_manager: ThreadManager,
                 system_monitor: SystemMonitor, config: Config,
-                report_generator: ReportGenerator = None, auto_scaler: AutoScaler = None,
-                alerting_system: AlertingSystem = None):
+                auto_scaler: AutoScaler = None, alerting_system: AlertingSystem = None):
         """
         Initialize the desktop application.
 
@@ -46,7 +44,6 @@ class DesktopApp:
             thread_manager: Thread manager instance
             system_monitor: System monitor instance
             config: Configuration object
-            report_generator: Report generator instance
             auto_scaler: Auto-scaler instance
             alerting_system: Alerting system instance
         """
@@ -54,7 +51,6 @@ class DesktopApp:
         self.thread_manager = thread_manager
         self.system_monitor = system_monitor
         self.config = config
-        self.report_generator = report_generator
         self.auto_scaler = auto_scaler
         self.alerting_system = alerting_system
 
@@ -150,11 +146,7 @@ class DesktopApp:
         tools_menu.add_command(label="Reset Resources", command=self._reset_resources)
         tools_menu.add_separator()
 
-        # Add report generation if available
-        if self.report_generator:
-            tools_menu.add_command(label="Generate Report", command=self._generate_report)
-            tools_menu.add_command(label="View Reports", command=self._view_reports)
-            tools_menu.add_separator()
+
 
         # Add auto-scaling if available
         if self.auto_scaler:
@@ -580,131 +572,7 @@ class DesktopApp:
         # Close button
         ttk.Button(frame, text="Close", command=dialog.destroy).pack(pady=10)
 
-    def _generate_report(self):
-        """Generate a resource usage report."""
-        if not self.report_generator:
-            messagebox.showinfo("Not Available", "Report generator is not enabled.")
-            return
 
-        # Create dialog
-        dialog = tk.Toplevel(self.root)
-        dialog.title("Generate Report")
-        dialog.geometry("400x300")
-        dialog.transient(self.root)
-        dialog.grab_set()
-
-        # Add content
-        frame = ttk.Frame(dialog, padding=10)
-        frame.pack(fill=tk.BOTH, expand=True)
-
-        ttk.Label(frame, text="Generate Resource Usage Report", font=("Arial", 14, "bold")).pack(pady=10)
-
-        # Report type selection
-        ttk.Label(frame, text="Report Type:").pack(anchor=tk.W, pady=(10, 5))
-
-        report_type_var = tk.StringVar(value="daily")
-        for report_type in ["daily", "weekly", "monthly"]:
-            ttk.Radiobutton(frame, text=report_type.capitalize(), variable=report_type_var, value=report_type).pack(anchor=tk.W)
-
-        # Buttons
-        button_frame = ttk.Frame(frame)
-        button_frame.pack(fill=tk.X, pady=15)
-
-        ttk.Button(button_frame, text="Generate", command=lambda: self._generate_report_file(
-            report_type_var.get(), dialog
-        )).pack(side=tk.RIGHT, padx=5)
-
-        ttk.Button(button_frame, text="Cancel", command=dialog.destroy).pack(side=tk.RIGHT, padx=5)
-
-    def _generate_report_file(self, report_type, dialog):
-        """Generate a report file."""
-        try:
-            # Generate report
-            report_path = self.report_generator.generate_report(report_type)
-
-            if report_path:
-                # Close dialog
-                dialog.destroy()
-
-                # Show success message with option to open
-                if messagebox.askyesno("Success", f"{report_type.capitalize()} report generated successfully. Would you like to open it?"):
-                    # Open report file
-                    try:
-                        webbrowser.open(f"file://{os.path.abspath(report_path)}")
-                    except Exception as e:
-                        messagebox.showerror("Error", f"Failed to open report: {e}")
-            else:
-                messagebox.showerror("Error", "Failed to generate report.")
-
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to generate report: {e}")
-
-    def _view_reports(self):
-        """View generated reports."""
-        if not self.report_generator:
-            messagebox.showinfo("Not Available", "Report generator is not enabled.")
-            return
-
-        # Get report history
-        report_history = self.report_generator.get_report_history()
-
-        # Create dialog
-        dialog = tk.Toplevel(self.root)
-        dialog.title("Reports")
-        dialog.geometry("600x400")
-        dialog.transient(self.root)
-        dialog.grab_set()
-
-        # Add content
-        frame = ttk.Frame(dialog, padding=10)
-        frame.pack(fill=tk.BOTH, expand=True)
-
-        ttk.Label(frame, text="Generated Reports", font=("Arial", 14, "bold")).pack(pady=10)
-
-        if not report_history:
-            ttk.Label(frame, text="No reports have been generated yet.").pack(pady=20)
-        else:
-            # Create table
-            columns = ("type", "date", "path")
-            tree = ttk.Treeview(frame, columns=columns, show="headings")
-
-            # Define headings
-            tree.heading("type", text="Type")
-            tree.heading("date", text="Date")
-            tree.heading("path", text="Path")
-
-            # Define columns
-            tree.column("type", width=100)
-            tree.column("date", width=150)
-            tree.column("path", width=300)
-
-            # Add data (most recent first)
-            for report in reversed(report_history):
-                tree.insert("", "end", values=(
-                    report["type"].capitalize(),
-                    time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(report["generated_at"])),
-                    report["path"]
-                ))
-
-            # Add scrollbar
-            scrollbar = ttk.Scrollbar(frame, orient=tk.VERTICAL, command=tree.yview)
-            tree.configure(yscrollcommand=scrollbar.set)
-            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-            tree.pack(fill=tk.BOTH, expand=True)
-
-            # Double-click to open report
-            def on_double_click(event):
-                item = tree.selection()[0]
-                path = tree.item(item, "values")[2]
-                try:
-                    webbrowser.open(f"file://{os.path.abspath(path)}")
-                except Exception as e:
-                    messagebox.showerror("Error", f"Failed to open report: {e}")
-
-            tree.bind("<Double-1>", on_double_click)
-
-        # Close button
-        ttk.Button(frame, text="Close", command=dialog.destroy).pack(pady=10)
 
 
 
@@ -1074,9 +942,7 @@ class DesktopApp:
             self.system_monitor.shutdown()
             self.resource_manager.shutdown()
 
-            # Stop report generator if available
-            if self.report_generator:
-                self.report_generator.stop()
+
 
             # Stop auto-scaler if available
             if self.auto_scaler:

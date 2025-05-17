@@ -79,7 +79,7 @@ class Config:
 
             "auto_scaling": {
                 "enabled": True,
-                "mode": "reactive", 
+                "mode": "reactive",
                 "check_interval": 300,  # seconds
                 "cooldown_period": 600,  # seconds
                 "scale_up_threshold": 80,  # percentage
@@ -98,14 +98,7 @@ class Config:
                 },
                 "cooldown_period": 300  # seconds
             },
-            "reports": {
-                "enabled": True,
-                "generation_interval": 86400,  # seconds (daily)
-                "retention_period": 30,  # days
-                "include_metrics": ["cpu", "memory", "disk", "network"],
-                "format": "html",  # html, pdf, json
-                "output_dir": "reports"
-            },
+
 
         }
 
@@ -354,11 +347,5 @@ class Config:
                 {"name": "enabled", "type": "boolean", "label": "Enable Alerting", "description": "Enable resource usage alerts"},
                 {"name": "cooldown_period", "type": "number", "label": "Cooldown Period", "description": "Time between alerts in seconds", "min": 1}
             ],
-            "reports": [
-                {"name": "enabled", "type": "boolean", "label": "Enable Reports", "description": "Enable report generation"},
-                {"name": "generation_interval", "type": "number", "label": "Generation Interval", "description": "Time between report generation in seconds", "min": 1},
-                {"name": "retention_period", "type": "number", "label": "Retention Period", "description": "Number of days to keep reports", "min": 1},
-                {"name": "format", "type": "select", "label": "Report Format", "description": "Format of generated reports", "options": ["html", "pdf", "json"]},
-                {"name": "output_dir", "type": "string", "label": "Output Directory", "description": "Directory to store generated reports"}
-            ]
+
         }
